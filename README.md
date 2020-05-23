@@ -2,10 +2,14 @@
 
 # Installation instructions
 
-Run `npm install`
+Run `npm install` in back & front folder
 
-# Run instructions
+# Run back instructions
 
-Run `npm run dev`
+Run `npm run dev` from back folder
+
+# Run front instructions
+
+Run `npm run serve` from front folder
 
 Access the website from `localhost:8080`
