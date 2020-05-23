@@ -9,26 +9,25 @@
     form(action="javascript:void(0);")
       .form-group
         button.btn.btn-secondary.btn-block(type="submit") Create room
-  </form>
 </template>
 
 <script>
 // @ is an alias to /src
-import Vue from 'vue'
-import Component from 'vue-class-component'
+import Vue from "vue";
+import Component from "vue-class-component";
 
-@Component
+@Component({})
 export default class Counter extends Vue {
   // Class properties will be component data
-  count = 0
+  count = 0;
 
   // Methods will be component methods
   increment() {
-    this.count++
+    this.count++;
   }
 
   decrement() {
-    this.count--
+    this.count--;
   }
 }
 </script>
