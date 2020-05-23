@@ -1,14 +1,20 @@
 <template lang="pug">
-  .content
-    form(action="javascript:void(0);")
-      .form-group
-        label.col-form-label-lg(for="roomID") Join a quiz room
-        input#roomID.form-control.form-control-lg(type="text" placeholder="Room ID")
-      button.btn.btn-primary.btn-lg.btn-block(type="submit") Join room
-    hr
-    form(action="javascript:void(0);")
-      .form-group
-        button.btn.btn-secondary.btn-block(type="submit") Create room
+  .container.page-content.h-100
+    .row.justify-content-center
+      .col-auto
+        .logo
+          h1 COZY QUIZ
+    .row.justify-content-center.text-center.align-items-center.h-100
+      .col-6.mx-auto
+        form(action="javascript:void(0);")
+          .form-group
+            label.col-form-label-lg(for="roomID") Join a quiz room
+            input#roomID.form-control.form-control-lg(type="text" placeholder="Room ID")
+          button.btn.btn-primary.btn-lg.btn-block(type="submit") Join room
+        hr
+        form(action="javascript:void(0);")
+          .form-group
+            button.btn.btn-secondary.btn-block(type="submit" v-on:click="openEditor()") Create room
 </template>
 
 <script>
@@ -18,16 +24,8 @@ import Component from "vue-class-component";
 
 @Component({})
 export default class Counter extends Vue {
-  // Class properties will be component data
-  count = 0;
-
-  // Methods will be component methods
-  increment() {
-    this.count++;
-  }
-
-  decrement() {
-    this.count--;
+  openEditor() {
+    this.$router.push("editor");
   }
 }
 </script>

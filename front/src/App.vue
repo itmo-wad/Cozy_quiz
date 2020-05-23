@@ -1,12 +1,5 @@
 <template lang="pug">
-  .container.page-content.h-100
-    .row.justify-content-center
-      .col-auto
-        .logo
-          h1 COZY QUIZ
-    .row.justify-content-center.text-center.align-items-center.h-100
-      .col-6.mx-auto
-        router-view
+  router-view
 </template>
 
 <style lang="scss">
@@ -30,11 +23,10 @@ body {
 </style>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue } from "vue-property-decorator";
 
 @Component({
-  components: {
-  },
+  components: {}
 })
 export default class App extends Vue {}
 </script>
