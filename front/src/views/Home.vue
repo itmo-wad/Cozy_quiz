@@ -23,7 +23,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 
 @Component({})
-export default class Counter extends Vue {
+export default class Home extends Vue {
   openEditor() {
     this.$router.push("editor");
   }

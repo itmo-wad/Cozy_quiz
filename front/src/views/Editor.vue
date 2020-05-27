@@ -1,25 +1,44 @@
 <template lang="pug">
   .page-content
-    nav.navbar.navbar-dark.sticky-top.bg-dark.flex-md-nowrap.p-0.shadow
-      input.form-control(type="text" v-model:input="quizName" placeHolder="Quiz title")
+    textarea.hidden-input(id="clipboard" value="salam")
+
+    b-modal#modal-1(title="Import quiz" v-on:ok="importQuiz($refs.importQuiz.value)")
+      label(for="importQuiz") Paste a previously exported quiz here
+      textarea.form-control#importQuiz(ref="importQuiz")
+
+    nav.navbar.navbar-dark.sticky-top.bg-dark.flex-md-nowrap.p-0.shadow.text-light
+      .col
+        input.form-control.quiz-title.text-light(type="text" v-model:input="quiz.quizName" placeHolder="Enter a quiz title...")
+      .col-auto
+        font-awesome-icon(:icon="['fas', 'upload']" v-b-modal.modal-1)
+      .col-auto
+        font-awesome-icon(:icon="['fas', 'save']" v-on:click="exportQuiz()")
+      .col-auto
+        button.btn.btn-success(v-on:click="removeQuestion(index)") Start quiz
     .container-fluid
       .row
-        nav#sidebarMenu.col-md-3.col-lg-2.d-md-block.bg-light.sidebar.collapse
-          .sidebar-sticky.pt-3
-            h6.sidebar-heading.d-flex.justify-content-between.align-items-center.px-3.mb-1.text-muted
-              span Questions
-              font-awesome-icon(:icon="['fas', 'plus-circle']" v-on:click="addQuestion()")
-            ul.nav.flex-column.mb-2
-              li.nav-item.tabItemQuestion(v-for="(question, index) in questions" v-on:click="selectQuestion(index)")
-                a.nav-link(v-bind:class="[{active: index == selectedQuestion}]")
-                  | {{ question.question || "New question" }}
+        sidebar(v-bind:questions="quiz.questions" v-model="currentQuestion" v-on:add="addQuestion()" v-on:remove="removeQuestion($event)")
 
     main.col-md-9.ml-sm-auto.col-lg-10.px-md-4(role="main")
-      div(v-if="questions[selectedQuestion]")
+      div(v-if="currentQuestion != undefined")
         .text-center
-          label(for="customRange3") {{ questions[selectedQuestion].delay }}
-          input.custom-range(type="range" min="0" max="5" step="0.5" v-bind:input="questions[selectedQuestion].delay")
-          textarea.form-control(v-model:input="questions[selectedQuestion].question" placeHolder="Type your question here")
+          // Question
+          textarea.form-control.question(v-model:input="currentQuestion.question" placeHolder="Type your question here")
+          .col-9.m-auto
+            .mt-5.text-right
+              | {{"Add answer "}}
+              font-awesome-icon.icon(:icon="['fas', 'plus-circle']" v-on:click="addAnswer()")
+            .mt-2
+              // Answers
+              .d-flex.flex-wrap.justify-content-around.align-items-center
+                answer(v-for="(answer, index) in currentQuestion.answers" v-model="answer.answer" :key="answer.id"
+                  :editable="true" :type="index == currentQuestion.rightAnswer ? 1 : -1"
+                  :deleteEnabled="currentQuestion.answers.length > 2"
+                  v-on:remove="removeAnswer(index)" v-on:select="selectAnswer(index)")
+            .mt-5
+              // Time selection
+              label(for="delayRange") Time for the question: {{ currentQuestion.delay }}s
+              input.custom-range#delayRange(type="range" min="5" max="30" step="1" v-model="currentQuestion.delay")
       div(v-else)
         .text-center
           h2 Please select or create a question first
@@ -29,33 +48,100 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 
-@Component({})
-export default class Counter extends Vue {
-  selectedQuestion: Number = 0;
+import { Quiz, Question, Answer } from "../Quiz";
 
-  quizName: string = "";
-  questions: object[] = [];
+import sidebar from "../components/sidebar.vue";
+import answer from "../components/answer.vue";
 
-  addQuestion() {
-    this.questions.push({
-      question: "",
-      delay: 0,
-      options: []
+@Component({
+  components: {
+    sidebar,
+    answer,
+  },
+  data: () => {
+    return {
+      currentQuestion: undefined,
+    };
+  },
+})
+export default class Editor extends Vue {
+  currentQuestion?: Question;
+
+  quiz: Quiz = new Quiz();
+
+  importQuiz(json: string) {
+    this.quiz = JSON.parse(json);
+
+    this.$bvToast.toast(`Quiz imported successfully`, {
+      title: "Quiz loaded !",
+      autoHideDelay: 3000,
+      appendToast: true,
+      toaster: "b-toaster-bottom-right",
     });
   }
 
-  selectQuestion(index: Number) {
-    this.selectedQuestion = index;
+  exportQuiz() {
+    let clipboardInput: HTMLInputElement | null = document.querySelector(
+      "#clipboard"
+    );
+    clipboardInput!.value = JSON.stringify(this.quiz);
+    clipboardInput?.select();
+    document.execCommand("copy");
+
+    this.$bvToast.toast(`Quiz copied to clipboard`, {
+      title: "Quiz saved !",
+      autoHideDelay: 3000,
+      appendToast: true,
+      toaster: "b-toaster-bottom-right",
+    });
+  }
+
+  addQuestion() {
+    this.quiz.questions.push(new Question());
+  }
+
+  removeQuestion(event: number) {
+    this.quiz.questions.splice(event, 1);
+  }
+
+  addAnswer() {
+    this.currentQuestion?.answers.push(new Answer());
+  }
+
+  removeAnswer(index: number) {
+    this.currentQuestion!.answers.splice(index, 1);
+  }
+
+  selectAnswer(index: number) {
+    this.currentQuestion!.rightAnswer = index;
   }
 }
 </script>
 
-<style lang="scss">
-.tabItemQuestion {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  width: 100%;
+<style lang="scss" scoped>
+.hidden-input {
+  position: fixed;
+  background: transparent;
+  color: transparent;
+  z-index: -1000;
+  border: none;
+  width: 0;
+  height: 0;
+}
+
+.quiz-title {
+  background-color: transparent;
+}
+
+.question {
+  outline: none;
+  resize: none;
+  text-align: center;
+  font-size: 3em;
+  overflow: auto;
+  border: none;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 body {
@@ -66,66 +152,6 @@ body {
   width: 16px;
   height: 16px;
   vertical-align: text-bottom;
-}
-
-/*
- * Sidebar
- */
-
-.sidebar {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 100; /* Behind the navbar */
-  padding: 48px 0 0; /* Height of navbar */
-  box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.1);
-}
-
-@media (max-width: 767.98px) {
-  .sidebar {
-    top: 5rem;
-  }
-}
-
-.sidebar-sticky {
-  /*! position: relative; */
-  /*! top: 0; */
-  /*! height: calc(100vh - 48px); */
-  padding-top: 0.5rem;
-  /*! overflow-x: hidden; */
-  /*! overflow-y: auto; */ /* Scrollable contents if viewport is shorter than content. */
-}
-
-@supports ((position: -webkit-sticky) or (position: sticky)) {
-  .sidebar-sticky {
-    /*! position: -webkit-sticky; */
-    /*! position: sticky; */
-  }
-}
-
-.sidebar .nav-link {
-  font-weight: 500;
-  color: #333;
-}
-
-.sidebar .nav-link .feather {
-  margin-right: 4px;
-  color: #999;
-}
-
-.sidebar .nav-link.active {
-  color: #007bff;
-}
-
-.sidebar .nav-link:hover .feather,
-.sidebar .nav-link.active .feather {
-  color: inherit;
-}
-
-.sidebar-heading {
-  font-size: 0.75rem;
-  text-transform: uppercase;
 }
 
 /*
