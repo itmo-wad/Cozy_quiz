@@ -64,7 +64,7 @@ export default class Quiz {
     this.roomID = roomID;
     this.quiz = quiz;
 
-    this.quiz = {
+    /*this.quiz = {
       quizName: "My super quiz",
       questions: [
         {
@@ -111,7 +111,7 @@ export default class Quiz {
           rightAnswer: 7,
         },
       ],
-    };
+    };*/
   }
 
   public joinRoom(socket: SocketIO.Socket): void {
