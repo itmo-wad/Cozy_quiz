@@ -5,7 +5,9 @@ export default class Timer {
 
   private isRunning = false;
   private cb?: () => void;
+  private updateCb?: () => void;
   private timeout?: NodeJS.Timeout;
+  private interval?: NodeJS.Timeout;
 
   constructor(delay: number) {
     this.timeLeft = delay;
@@ -13,15 +15,22 @@ export default class Timer {
   }
 
   public start(): void {
+    if (this.isRunning) return;
+    clearTimeout(this.timeout);
     this.isRunning = true;
     this.endTime = new Date().getTime() + this.timeLeft;
     this.timeout = setTimeout(this._finish.bind(this), this.timeLeft);
+    this.interval = setInterval(this._update.bind(this), 500);
+    this._update();
   }
 
   public pause(): void {
+    if (!this.isRunning) return;
     this.isRunning = false;
     this.timeLeft = this._getElapsedTime();
+    this._update();
     clearTimeout(this.timeout);
+    clearInterval(this.interval);
   }
 
   public getTimeLeft(): number {
@@ -44,8 +53,16 @@ export default class Timer {
     this.initialTime = delay;
   }
 
+  public onUpdate(fn: () => void): void {
+    this.updateCb = fn;
+  }
+
   public onFinish(fn: () => void): void {
     this.cb = fn;
+  }
+
+  private _update() {
+    if (this.updateCb) this.updateCb();
   }
 
   private _finish() {

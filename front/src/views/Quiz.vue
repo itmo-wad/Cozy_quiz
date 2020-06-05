@@ -8,13 +8,12 @@
     .container-fluid
       .row
         nav#sidebarMenu.col-md-3.col-lg-2.d-md-block.bg-light.sidebar.collapse
-          .container
+          .container(v-if="$store.state.roomInfos.myID == $store.state.roomInfos.ownerID")
             .row.justify-content-center
               .col-auto
-                b-button(v-b-tooltip.hover.top="'Previous question!'")
-                  font-awesome-icon.icon(:icon="['fas', 'backward']")
-              .col-auto
-                b-button(v-b-tooltip.hover.top="'Start quiz!'" v-on:click="$quizClient.play()")
+                b-button(v-if="$store.state.gameState.status != 'paused'" v-b-tooltip.hover.top="'Pause quiz!'" v-on:click="$quizClient.pause()")
+                  font-awesome-icon.icon(:icon="['fas', 'pause']")
+                b-button(v-else v-b-tooltip.hover.top="'Start quiz!'" v-on:click="$quizClient.play()")
                   font-awesome-icon.icon(:icon="['fas', 'play']")
               .col-auto
                 b-button(v-b-tooltip.hover.top="'Skip question!'")
@@ -27,13 +26,18 @@
                 .row.w-100.align-items-center
                   .col.overflow-hidden
                     .nav-link(v-bind:class="[{active: id == $store.state.roomInfos.myID}]")
-                      font-awesome-icon.icon(v-if="id == $store.state.roomInfos.ownerID" :icon="['fas', 'crown']")
-                      | {{ player.name }}
+                      div(v-if="id == $store.state.roomInfos.ownerID")
+                        font-awesome-icon.icon( :icon="['fas', 'crown']")
+                        | {{ player.name }}
+                      div(v-else)
+                        | {{ player.score }} {{ player.name }}
 
     main.col-md-9.ml-sm-auto.col-lg-10.px-md-4(role="main")
       .text-center
-        div(v-if="!this.$store.state.gameState.question")
+        div(v-if="!this.$store.state.gameState.question && this.$store.state.gameState.status != 'finished'")
           h2 Waiting for room owner to start the quiz
+        div(v-else-if="this.$store.state.gameState.status == 'finished'")
+          h2 Thanks for playing, this quiz is over
         div(v-else)
           // Question
           .question {{this.$store.state.gameState.question.question}}
@@ -45,7 +49,10 @@
                     :editable="false" :type="0"
                     v-on:select="selectAnswer(index)")
             .mt-5
-              b-progress(:value="this.$store.state.gameState.timeLeft" :max="this.$store.state.gameState.maxTime")
+              div(v-if="!this.$store.state.gameState.answer")
+                b-progress(:value="this.$store.state.gameState.timeLeft" :max="this.$store.state.gameState.maxTime")
+              div(v-else)
+                | {{ Math.round(this.$store.state.gameState.timeLeft / 1000) }}s before next question
 </template>
 
 <script>

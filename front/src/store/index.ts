@@ -13,7 +13,13 @@ export default new Vuex.Store({
       ownerID: "",
       myID: "",
     },
-    gameState: {},
+    gameState: {
+      status: "paused",
+      timeLeft: 0,
+      maxTime: 0,
+      question: null,
+      answer: null,
+    },
   },
   mutations: {
     joinRoom(state, payload) {
@@ -29,10 +35,16 @@ export default new Vuex.Store({
       state.gameState = { ...state.gameState, status: payload.status };
     },
     updateQuestion(state, payload) {
+      delete state.gameState.answer;
       state.gameState = { ...state.gameState, question: payload.question };
     },
     updateTimeLeft(state, payload) {
       state.gameState = { ...state.gameState, ...payload };
+    },
+    updateAnswer(state, payload) {
+      console.log(state.gameState);
+      state.gameState = { ...state.gameState, ...payload };
+      console.log(state.gameState);
     },
   },
   actions: {},

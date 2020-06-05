@@ -26,6 +26,7 @@ export default class QuizClient {
     this.ws.on("pause", this._onPause.bind(this));
     this.ws.on("questionStart", this._onQuestionStart.bind(this));
     this.ws.on("timerUpdate", this._onTimerUpdate.bind(this));
+    this.ws.on("answer", this._onAnswer.bind(this));
   }
 
   public on(eventName: string, fn: Function) {
@@ -46,6 +47,10 @@ export default class QuizClient {
 
   public pause() {
     this.ws.emit("pause", store.state.room);
+  }
+
+  public selectAnswer(answer: number) {
+    this.ws.emit("selectAnswer", store.state.room, answer);
   }
 
   private _onCreateRoom(status: number, ...args: any) {
@@ -98,5 +103,9 @@ export default class QuizClient {
 
   private _onTimerUpdate(roomId: string, timeLeft: number, maxTime: number) {
     store.commit("updateTimeLeft", { timeLeft, maxTime });
+  }
+
+  private _onAnswer(roomId: string, answer: number) {
+    store.commit("updateAnswer", { answer });
   }
 }
