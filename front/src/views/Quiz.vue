@@ -34,10 +34,10 @@
 
     main.col-md-9.ml-sm-auto.col-lg-10.px-md-4(role="main")
       .text-center
-        div(v-if="!this.$store.state.gameState.question && this.$store.state.gameState.status != 'finished'")
-          h2 Waiting for room owner to start the quiz
-        div(v-else-if="this.$store.state.gameState.status == 'finished'")
+        div(v-if="this.$store.state.gameState.status == 'finished'")
           h2 Thanks for playing, this quiz is over
+        div(v-else-if="!this.$store.state.gameState.question && this.$store.state.gameState.status != 'finished'")
+          h2 Waiting for room owner to start the quiz
         div(v-else)
           // Question
           .question {{this.$store.state.gameState.question.question}}

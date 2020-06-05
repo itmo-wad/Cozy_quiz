@@ -135,8 +135,8 @@ export default class Quiz {
   }
 
   public play(): void {
-    if (this.status != Status.playing) {
-      if (this.currentQuestionIndex == -1) this.nextQuestion();
+    if (this.status == Status.paused) {
+      if (this.currentQuestionIndex == -1) if (!this.nextQuestion()) return;
       this.status = Status.playing;
       this.timer.start();
       this._broadcast((socket) => {
@@ -146,22 +146,27 @@ export default class Quiz {
   }
 
   public pause(): void {
-    this.status = Status.paused;
-    this.timer.pause();
-    this._broadcast((socket) => {
-      socket.emit("pause", this.roomID, Status.paused);
-    });
+    if (this.status == Status.playing) {
+      this.status = Status.paused;
+      this.timer.pause();
+      this._broadcast((socket) => {
+        socket.emit("pause", this.roomID, Status.paused);
+      });
+    }
   }
 
   /**
    * Start the next question
    * -
    */
-  public nextQuestion(): void {
+  public nextQuestion(): boolean {
     this.currentQuestionIndex++;
-    if (this.currentQuestionIndex >= this.quiz.questions.length) {
+    if (
+      !this.quiz.questions ||
+      this.currentQuestionIndex >= this.quiz.questions.length
+    ) {
       this._quizFinished();
-      return;
+      return false;
     }
     this.currentQuestion = this.quiz.questions[this.currentQuestionIndex];
     this.timer.setTimeLeft(this.currentQuestion.delay * 1000);
@@ -169,6 +174,7 @@ export default class Quiz {
 
     this.timer.onFinish(this._questionEnd.bind(this));
     this.timer.onUpdate(this._updateTimer.bind(this));
+    return true;
   }
 
   private _sendRoomInfos(socket: SocketIO.Socket): void {
