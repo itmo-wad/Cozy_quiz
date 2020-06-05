@@ -12,7 +12,15 @@ class Question {
 
 class Answer {
   answer: string = "New answer";
-  id: number = Math.random();
+  id?: number;
+
+  constructor() {
+    this.genID();
+  }
+
+  genID() {
+    this.id = Math.random();
+  }
 }
 
 class Quiz {

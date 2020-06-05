@@ -14,7 +14,7 @@
       .col-auto
         font-awesome-icon(:icon="['fas', 'save']" v-on:click="exportQuiz()")
       .col-auto
-        button.btn.btn-success(v-on:click="removeQuestion(index)") Start quiz
+        button.btn.btn-success(v-on:click="startQuiz()") Start quiz
     .container-fluid
       .row
         sidebar(v-bind:questions="quiz.questions" v-model="currentQuestion" v-on:add="addQuestion()" v-on:remove="removeQuestion($event)")
@@ -114,6 +114,10 @@ export default class Editor extends Vue {
 
   selectAnswer(index: number) {
     this.currentQuestion!.rightAnswer = index;
+  }
+
+  startQuiz() {
+    this.$quizClient.createRoom(JSON.stringify(this.quiz));
   }
 }
 </script>

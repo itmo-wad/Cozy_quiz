@@ -1,7 +1,8 @@
 <template lang="pug">
   .answer.d-inline-flex.p-2.bd-highlight.col-5.mb-4(v-bind:class="{ 'bg-success': type == 1, 'bg-danger': type == -1, 'bg-secondary': type == 0 }")
-    .div(v-if="!editable")
-      | {{ answer }}
+    .row.w-100.no-gutters(v-if="!editable")
+      .col
+        | {{ answer }}
     .row.w-100.no-gutters(v-else="")
       .col
         ExpandableTextArea(v-bind:value="answer" v-on:input="update")

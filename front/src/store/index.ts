@@ -4,8 +4,14 @@ import Vuex from "vuex";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  state: {},
-  mutations: {},
+  state: {
+    room: "",
+  },
+  mutations: {
+    joinRoom(state, payload) {
+      state.room = payload.room;
+    },
+  },
   actions: {},
-  modules: {}
+  modules: {},
 });
