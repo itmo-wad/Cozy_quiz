@@ -19,7 +19,7 @@ const routes = [
   },
   {
     path: "/quiz/",
-    name: "quiz",
+    name: "Quiz",
     component: Quiz,
   },
 ];

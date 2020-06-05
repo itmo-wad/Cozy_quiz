@@ -56,13 +56,13 @@ import answer from "../components/answer.vue";
 @Component({
   components: {
     sidebar,
-    answer,
+    answer
   },
   data: () => {
     return {
-      currentQuestion: undefined,
+      currentQuestion: undefined
     };
-  },
+  }
 })
 export default class Editor extends Vue {
   currentQuestion?: Question;
@@ -76,23 +76,24 @@ export default class Editor extends Vue {
       title: "Quiz loaded !",
       autoHideDelay: 3000,
       appendToast: true,
-      toaster: "b-toaster-bottom-right",
+      toaster: "b-toaster-bottom-right"
     });
   }
 
   exportQuiz() {
-    let clipboardInput: HTMLInputElement | null = document.querySelector(
+    const clipboardInput: HTMLInputElement | null = document.querySelector(
       "#clipboard"
     );
-    clipboardInput!.value = JSON.stringify(this.quiz);
-    clipboardInput?.select();
+    if (!clipboardInput) return;
+    clipboardInput.value = JSON.stringify(this.quiz);
+    clipboardInput.select();
     document.execCommand("copy");
 
     this.$bvToast.toast(`Quiz copied to clipboard`, {
       title: "Quiz saved !",
       autoHideDelay: 3000,
       appendToast: true,
-      toaster: "b-toaster-bottom-right",
+      toaster: "b-toaster-bottom-right"
     });
   }
 
@@ -109,11 +110,11 @@ export default class Editor extends Vue {
   }
 
   removeAnswer(index: number) {
-    this.currentQuestion!.answers.splice(index, 1);
+    this.currentQuestion?.answers.splice(index, 1);
   }
 
   selectAnswer(index: number) {
-    this.currentQuestion!.rightAnswer = index;
+    if (this.currentQuestion) this.currentQuestion.rightAnswer = index;
   }
 
   startQuiz() {

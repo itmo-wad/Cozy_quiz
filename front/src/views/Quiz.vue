@@ -2,7 +2,9 @@
   .page-content
     nav.navbar.navbar-dark.sticky-top.bg-dark.flex-md-nowrap.p-0.shadow.text-light
       .col
-        | Quiz title
+        | (RoomID: {{this.$store.state.roomInfos.roomID}})
+      .col
+        | {{this.$store.state.roomInfos.quizName}}
     .container-fluid
       .row
         nav#sidebarMenu.col-md-3.col-lg-2.d-md-block.bg-light.sidebar.collapse
@@ -12,36 +14,38 @@
                 b-button(v-b-tooltip.hover.top="'Previous question!'")
                   font-awesome-icon.icon(:icon="['fas', 'backward']")
               .col-auto
-                b-button(v-b-tooltip.hover.top="'Start quiz!'")
+                b-button(v-b-tooltip.hover.top="'Start quiz!'" v-on:click="$quizClient.play()")
                   font-awesome-icon.icon(:icon="['fas', 'play']")
               .col-auto
                 b-button(v-b-tooltip.hover.top="'Skip question!'")
                   font-awesome-icon.icon(:icon="['fas', 'forward']")
           .sidebar-sticky.pt-3
-            h6.sidebar-heading.d-flex.justify-content-between.align-items-center.px-3.mb-1.text-muted
+            h6.sidebar-heading.d-flex.justify-content-between.align-items-center.px-3.mb-1.text-muted(v-on:click="() => {console.log(this.$store.state.roomInfos.players)}")
               span Players
             ul.nav.flex-column.mb-2
-              li.nav-item.questionsItem
+              li.nav-item.questionsItem(v-for="(player, id) in this.$store.state.roomInfos.players" :index="id")
                 .row.w-100.align-items-center
                   .col.overflow-hidden
-                    .nav-link
-                      font-awesome-icon.icon(:icon="['fas', 'crown']")
-                      | Freebios
+                    .nav-link(v-bind:class="[{active: id == $store.state.roomInfos.myID}]")
+                      font-awesome-icon.icon(v-if="id == $store.state.roomInfos.ownerID" :icon="['fas', 'crown']")
+                      | {{ player.name }}
 
     main.col-md-9.ml-sm-auto.col-lg-10.px-md-4(role="main")
       .text-center
-        // Question
-        .question Hello
-        .col-9.m-auto
-          .mt-2
-            // Answers
-            .d-flex.flex-wrap.justify-content-around.align-items-center
-              answer(:answer="'answer'" :key="'id'"
-                  :editable="false" :type="0"
-                  v-on:remove="removeAnswer(index)" v-on:select="selectAnswer(index)")
-          .mt-5
-            // Time selection
-            input.custom-range#delayRange(type="range" min="5" max="30" step="1")
+        div(v-if="!this.$store.state.gameState.question")
+          h2 Waiting for room owner to start the quiz
+        div(v-else)
+          // Question
+          .question {{this.$store.state.gameState.question.question}}
+          .col-9.m-auto
+            .mt-2
+              // Answers
+              .d-flex.flex-wrap.justify-content-around.align-items-center
+                answer(v-for="(answer, index) in this.$store.state.gameState.question.answers" :answer="answer.answer" :key="index"
+                    :editable="false" :type="0"
+                    v-on:select="selectAnswer(index)")
+            .mt-5
+              b-progress(:value="this.$store.state.gameState.timeLeft" :max="this.$store.state.gameState.maxTime")
 </template>
 
 <script>
@@ -65,6 +69,13 @@ export default class Quiz extends Vue {
 <style lang="scss" scoped>
 .quiz-title {
   background-color: transparent;
+}
+
+.questionsItem {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
 .question {

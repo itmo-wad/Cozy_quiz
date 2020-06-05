@@ -93,19 +93,19 @@ import Component from "vue-class-component";
   props: {
     questions: {
       type: Array,
-      required: true,
+      required: true
     },
     currentQuestion: {
-      type: Object,
-    },
+      type: Object
+    }
   },
   model: {
     event: "input",
-    prop: "currentQuestion",
-  },
+    prop: "currentQuestion"
+  }
 })
 export default class Sidebar extends Vue {
-  selectedQuestionIndex: number = 0;
+  selectedQuestionIndex = 0;
 
   addQuestion() {
     this.$emit("add");
