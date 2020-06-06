@@ -32,11 +32,6 @@ io.on("connect", (socket) => {
       socket.join(roomID);
     } else socket.emit("joinRoom", 404, "Room not found");
   });
-
-  socket.on("status", (roomID) => {
-    if (rooms.has(roomID)) socket.emit("joinRoom", 200, roomID);
-    else socket.emit("joinRoom", 404, "Room not found");
-  });
 });
 
 export { router as api };
