@@ -1,15 +1,32 @@
-## Cozy_quiz
+# Cozy_quiz
 
-# Installation instructions
+## Development
 
-Run `npm install` in back & front folder
+**IMPORTANT: Start backend first then frontend !**
 
-# Run back instructions
+### Backend
 
-Run `npm run dev` from back folder
+Subfolder: `back`
 
-# Run front instructions
+Installation: `npm install`
+Run: `npm run dev`
 
-Run `npm run serve` from front folder
+Backend will be served on `localhost:8080`
 
-Access the website from `localhost:8080`
+### Frontend
+
+Subfolder: `front`
+
+Installation: `npm install`
+Run: `npm run serve`
+
+Frontend will be served on `localhost:8081`
+
+
+## Production
+
+Deployment using docker-compose
+
+Go to the root folder of the project and then simply run `docker-compose up`
+
+app will be served on port 8080
