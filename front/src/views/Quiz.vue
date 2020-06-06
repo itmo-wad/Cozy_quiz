@@ -15,11 +15,11 @@
                   font-awesome-icon.icon(:icon="['fas', 'pause']")
                 b-button(v-else v-b-tooltip.hover.top="'Start quiz!'" v-on:click="$quizClient.play()")
                   font-awesome-icon.icon(:icon="['fas', 'play']")
-              .col-auto
+              //.col-auto
                 b-button(v-b-tooltip.hover.top="'Skip question!'")
                   font-awesome-icon.icon(:icon="['fas', 'forward']")
           .sidebar-sticky.pt-3
-            h6.sidebar-heading.d-flex.justify-content-between.align-items-center.px-3.mb-1.text-muted(v-on:click="() => {console.log(this.$store.state.roomInfos.players)}")
+            h6.sidebar-heading.d-flex.justify-content-between.align-items-center.px-3.mb-1.text-muted
               span Players
             ul.nav.flex-column.mb-2
               li.nav-item.questionsItem(v-for="(player, id) in this.$store.state.roomInfos.players" :index="id")
@@ -45,30 +45,39 @@
             .mt-2
               // Answers
               .d-flex.flex-wrap.justify-content-around.align-items-center
-                answer(v-for="(answer, index) in this.$store.state.gameState.question.answers" :answer="answer.answer" :key="index"
-                    :editable="false" :type="0"
-                    v-on:select="selectAnswer(index)")
+                answer2(v-for="(answer, index) in this.$store.state.gameState.question.answers"
+                  :text="answer.answer"
+                  :key="index"
+                  :selected="$store.state.selectedAnswer == index"
+                  :good="$store.state.gameState.answer ? index == $store.state.gameState.answer ? 1 : -1 : 0"
+                  v-on:click.native="select(index)")
             .mt-5
-              div(v-if="!this.$store.state.gameState.answer")
+              div(v-if="this.$store.state.gameState.answer == undefined")
                 b-progress(:value="this.$store.state.gameState.timeLeft" :max="this.$store.state.gameState.maxTime")
               div(v-else)
                 | {{ Math.round(this.$store.state.gameState.timeLeft / 1000) }}s before next question
 </template>
 
-<script>
+<script lang="ts">
 // @ is an alias to /src
 import Vue from "vue";
 import Component from "vue-class-component";
-import answer from "../components/answer";
+import answer2 from "../components/answer2.vue";
 
 @Component({
   components: {
-    answer,
-  },
+    answer2
+  }
 })
 export default class Quiz extends Vue {
   mounted() {
     if (this.$store.state.room == "") this.$router.push({ name: "Home" });
+  }
+
+  select(id: number) {
+    if (this.$store.state.gameState.answer != undefined) return;
+    this.$store.commit("updateSelectedAnswer", id);
+    this.$quizClient.selectAnswer(id);
   }
 }
 </script>

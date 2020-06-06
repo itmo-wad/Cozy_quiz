@@ -1,19 +1,12 @@
 <template lang="pug">
-  .answer.d-inline-flex.p-2.bd-highlight.col-5.mb-4(v-bind:class="{ 'bg-success': type == 1, 'bg-danger': type == -1, 'bg-secondary': type == 0 }")
-    .row.w-100.no-gutters(v-if="!editable")
+  .answer.d-inline-flex.p-2.bd-highlight.col-5.mb-4.bg-primary(v-bind:class="{ 'bg-success': good == 1, 'bg-danger': good == -1, 'selected': selected }")
+    .row.w-100.no-gutters
       .col
-        | {{ answer }}
-    .row.w-100.no-gutters(v-else="")
-      .col
-        ExpandableTextArea(v-bind:value="answer" v-on:input="update")
-      .col-auto.mr-auto(v-if="controlsEnabled")
-        font-awesome-icon.icon(:icon="['fas', 'check']" v-on:click="$emit('select')")
-        font-awesome-icon.icon(v-if="deleteEnabled" :icon="['fas', 'trash']" v-on:click="$emit('remove')")
+        | {{ text }}
 </template>
 
 <style lang="scss" scoped>
 .answer {
-  background-color: grey;
   border-radius: 25px;
   text-align: center;
   word-wrap: break-word;
@@ -22,6 +15,11 @@
 .icon {
   margin-left: 5px;
   margin-right: 5px;
+}
+
+.selected {
+  transform: scale(1.1);
+  font-weight: 600;
 }
 </style>
 
@@ -33,41 +31,18 @@ import ExpandableTextArea from "./expandableTextArea.vue";
 
 @Component({
   props: {
-    answer: {
-      type: String,
-      default: "",
-    },
-    editable: {
+    selected: {
       type: Boolean,
-      default: false,
+      default: false
     },
-    controlsEnabled: {
-      type: Boolean,
-      default: true,
-    },
-    deleteEnabled: {
-      type: Boolean,
-      default: true,
-    },
-    // -1 wrong, 0 neutral, 1 good
-    type: {
+    good: {
       type: Number,
-      default: 0,
+      default: 0
     },
-  },
-  components: {
-    ExpandableTextArea,
-  },
-  model: {
-    event: "input",
-    prop: "answer",
-  },
-})
-export default class Answer extends Vue {
-  update(value: string) {
-    if (this.$props.editable) {
-      this.$emit("input", value);
+    text: {
+      type: String
     }
   }
-}
+})
+export default class Answer extends Vue {}
 </script>

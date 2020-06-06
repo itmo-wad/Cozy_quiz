@@ -120,17 +120,21 @@ export default class Quiz {
     //this.sendRoomInfos(socket);
     this._broadcast(this._sendRoomInfos);
     this._sendState(socket);
+    this._sendQuestion(socket);
 
-    socket.on("play", (roomID) => {
+    socket.on("play", (roomID: string) => {
+      if (roomID != this.roomID) return;
       this.play();
     });
 
-    socket.on("pause", (roomID) => {
+    socket.on("pause", (roomID: string) => {
+      if (roomID != this.roomID) return;
       this.pause();
     });
 
-    socket.on("selectAnswer", (roomID, answer) => {
-      this.players[roomID.id].setAnswer(answer);
+    socket.on("selectAnswer", (roomID: string, answer: number) => {
+      if (roomID != this.roomID) return;
+      this.players[socket.id].setAnswer(answer);
     });
   }
 
@@ -202,16 +206,7 @@ export default class Quiz {
 
   private _questionStart(): void {
     this.timer.start();
-    this._broadcast((socket) => {
-      socket.emit(
-        "questionStart",
-        this.roomID,
-        this.currentQuestion.question,
-        this.currentQuestion.answers,
-        this.timer.getTimeLeft(),
-        this.timer.getInitialTime()
-      );
-    });
+    this._broadcast(this._sendQuestion.bind(this));
   }
 
   /**
@@ -225,6 +220,7 @@ export default class Quiz {
       this.players[player].answer = -1;
     }
 
+    this._broadcast(this._sendRoomInfos.bind(this));
     // Send answer to players
     this._sendAnswer();
 
@@ -255,6 +251,18 @@ export default class Quiz {
   private _quizFinished(): void {
     this.status = Status.finished;
     this._broadcast(this._sendState);
+  }
+
+  private _sendQuestion(socket: SocketIO.Socket): void {
+    if (this.currentQuestionIndex == -1) return;
+    socket.emit(
+      "questionStart",
+      this.roomID,
+      this.currentQuestion.question,
+      this.currentQuestion.answers,
+      this.timer.getTimeLeft(),
+      this.timer.getInitialTime()
+    );
   }
 
   private _sendAnswer(): void {

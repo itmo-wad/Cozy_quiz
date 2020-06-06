@@ -20,6 +20,7 @@ export default new Vuex.Store({
       question: null,
       answer: null,
     },
+    selectedAnswer: -1,
   },
   mutations: {
     joinRoom(state, payload) {
@@ -36,15 +37,17 @@ export default new Vuex.Store({
     },
     updateQuestion(state, payload) {
       delete state.gameState.answer;
+      state.selectedAnswer = -1;
       state.gameState = { ...state.gameState, question: payload.question };
     },
     updateTimeLeft(state, payload) {
       state.gameState = { ...state.gameState, ...payload };
     },
     updateAnswer(state, payload) {
-      console.log(state.gameState);
       state.gameState = { ...state.gameState, ...payload };
-      console.log(state.gameState);
+    },
+    updateSelectedAnswer(state, payload) {
+      state.selectedAnswer = payload;
     },
   },
   actions: {},
