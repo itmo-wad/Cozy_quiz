@@ -69,6 +69,9 @@ export default class Editor extends Vue {
 
   quiz: Quiz = new Quiz();
 
+  /**
+   * Import quiz from json
+   */
   importQuiz(json: string) {
     this.quiz = JSON.parse(json);
 
@@ -80,11 +83,16 @@ export default class Editor extends Vue {
     });
   }
 
+  /**
+   * Export quiz to json
+   */
   exportQuiz() {
     const clipboardInput: HTMLInputElement | null = document.querySelector(
       "#clipboard"
     );
     if (!clipboardInput) return;
+
+    // Do some magic to be able to copy to clipboard
     clipboardInput.value = JSON.stringify(this.quiz);
     clipboardInput.select();
     document.execCommand("copy");

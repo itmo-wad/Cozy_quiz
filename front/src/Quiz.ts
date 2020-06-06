@@ -1,3 +1,7 @@
+/**
+ * Answer class
+ * TODO: remove ID on export and generate it again on import, this should stay internal
+ */
 class Answer {
   answer = "New answer";
   id?: number;
@@ -11,6 +15,9 @@ class Answer {
   }
 }
 
+/**
+ * Question class including all question, answers, rigt answer, delay
+ */
 class Question {
   question = "";
   delay = 15;
@@ -23,6 +30,9 @@ class Question {
   }
 }
 
+/**
+ * Quiz class used for saving, exporting, sending to server
+ */
 class Quiz {
   quizName = "";
   questions: Question[] = [];

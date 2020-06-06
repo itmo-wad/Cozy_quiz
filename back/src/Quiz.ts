@@ -1,5 +1,6 @@
 import Timer from "./Timer";
 
+// Class describing a Player
 class Player {
   name = "Player#" + Math.round(Math.random() * 9999);
   score = 0;
@@ -26,6 +27,7 @@ class Player {
   }
 }
 
+// Interface describing a Question
 interface QuizQuestion {
   question: string;
   delay: number;
@@ -42,12 +44,14 @@ interface QuizData {
   questions: QuizQuestion[];
 }
 
+// Enum of the possible status of the room
 enum Status {
   playing = "playing",
   paused = "paused",
   finished = "finished",
 }
 
+// Quiz class
 export default class Quiz {
   roomID: string;
   players: Record<string, Player> = {};
@@ -65,6 +69,10 @@ export default class Quiz {
     this.quiz = JSON.parse(quiz);
   }
 
+  /**
+   * Join room
+   * @param socket user socket
+   */
   public joinRoom(socket: SocketIO.Socket): void {
     this.players[socket.id] = new Player(socket);
     if (!this.ownerID) this.ownerID = socket.id;
@@ -89,8 +97,12 @@ export default class Quiz {
     });
   }
 
+  /**
+   * Start timer
+   */
   public play(): void {
     if (this.status == Status.paused) {
+      // If quiz did not started yet, go to next question
       if (this.currentQuestionIndex == -1) if (!this.nextQuestion()) return;
       this.status = Status.playing;
       this.timer.start();
@@ -100,6 +112,9 @@ export default class Quiz {
     }
   }
 
+  /**
+   * Pause the timer
+   */
   public pause(): void {
     if (this.status == Status.playing) {
       this.status = Status.paused;
@@ -112,7 +127,6 @@ export default class Quiz {
 
   /**
    * Start the next question
-   * -
    */
   public nextQuestion(): boolean {
     this.currentQuestionIndex++;
@@ -132,6 +146,10 @@ export default class Quiz {
     return true;
   }
 
+  /**
+   * Send room informations
+   * @param socket User socket
+   */
   private _sendRoomInfos(socket: SocketIO.Socket): void {
     socket.emit("roomInfos", this.roomID, {
       roomID: this.roomID,
@@ -142,6 +160,10 @@ export default class Quiz {
     });
   }
 
+  /**
+   * Send room game state
+   * @param socket User socket
+   */
   private _sendState(socket: SocketIO.Socket): void {
     socket.emit("state", this.roomID, {
       status: this.status,
@@ -150,18 +172,25 @@ export default class Quiz {
     });
   }
 
+  /**
+   * Will call a function for every player connected to the room
+   * @param fn Function called for broadcast
+   */
   private _broadcast(fn: (socket: SocketIO.Socket) => void): void {
     for (const player in this.players)
       fn.bind(this)(this.players[player].socket);
   }
 
+  /**
+   * On question start event
+   */
   private _questionStart(): void {
     this.timer.start();
     this._broadcast(this._sendQuestion.bind(this));
   }
 
   /**
-   * Time for question is over
+   * On question end event (called by timer)
    */
   private _questionEnd(): void {
     // Count scores and reset selected answer
@@ -182,12 +211,15 @@ export default class Quiz {
   }
 
   /**
-   * Time to show answers is over
+   * On pause end event (called by timer)
    */
   private _answerEnd(): void {
     this.nextQuestion();
   }
 
+  /**
+   * Broadcast timer update to clients
+   */
   private _updateTimer(): void {
     this._broadcast((socket) => {
       socket.emit(
@@ -199,11 +231,18 @@ export default class Quiz {
     });
   }
 
+  /**
+   * On quiz finish
+   */
   private _quizFinished(): void {
     this.status = Status.finished;
     this._broadcast(this._sendState);
   }
 
+  /**
+   * Send question and possible answers
+   * @param socket Client socket
+   */
   private _sendQuestion(socket: SocketIO.Socket): void {
     if (this.currentQuestionIndex == -1) return;
     socket.emit(
@@ -216,6 +255,9 @@ export default class Quiz {
     );
   }
 
+  /**
+   * Send the right answer for display to client
+   */
   private _sendAnswer(): void {
     this._broadcast((socket) => {
       socket.emit("answer", this.roomID, this.currentQuestion.rightAnswer);

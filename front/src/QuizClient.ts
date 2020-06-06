@@ -6,6 +6,10 @@ interface EventListener {
   singleUse: boolean;
 }
 
+/**
+ * Brain of communication in the app
+ * TODO: Add many check on where the packet come from (which room) an stuff like this
+ */
 export default class QuizClient {
   private ws: SocketIOClient.Socket;
 
@@ -13,11 +17,16 @@ export default class QuizClient {
 
   constructor(ws: SocketIOClient.Socket) {
     this.ws = ws;
+
+    // On reconnect join room
     this.ws.on("connect", () => {
       if (store.state.room) {
         this.joinRoom(store.state.room);
       }
     });
+    /**
+     * Register all event listeners
+     */
     this.ws.on("createRoom", this._onCreateRoom.bind(this));
     this.ws.on("joinRoom", this._onJoinRoom.bind(this));
     this.ws.on("roomInfos", this._onRoomInfos.bind(this));
@@ -53,6 +62,11 @@ export default class QuizClient {
     this.ws.emit("selectAnswer", store.state.room, answer);
   }
 
+  /**
+   * On room created
+   * @param status Response status
+   * @param args Room ID
+   */
   private _onCreateRoom(status: number, ...args: any) {
     if (status == 200) {
       this.joinRoom(args[0]);
@@ -61,11 +75,19 @@ export default class QuizClient {
     }
   }
 
+  /**
+   * On room joined
+   * @param status Response status
+   * @param args RoomID
+   */
   private _onJoinRoom(status: number, ...args: any) {
+    // Room found
     if (status == 200) {
       store.commit("joinRoom", { room: args[0] });
       router.push({ name: "Quiz" });
-    } else if (status == 404) {
+    }
+    // Room not found
+    else if (status == 404) {
       console.log("room not found");
       store.commit("joinRoom", { room: "" });
       router.push({ name: "Home" });
