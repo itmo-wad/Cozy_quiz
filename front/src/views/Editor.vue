@@ -38,7 +38,7 @@
             .mt-5
               // Time selection
               label(for="delayRange") Time for the question: {{ currentQuestion.delay }}s
-              input.custom-range#delayRange(type="range" min="5" max="30" step="1" v-model="currentQuestion.delay")
+              input.custom-range#delayRange(type="range" min="5" max="30" step="1" v-bind:value="currentQuestion.delay" v-on:input="currentQuestion.delay = Number($event.target.value)")
       div(v-else)
         .text-center
           h2 Please select or create a question first

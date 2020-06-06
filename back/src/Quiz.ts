@@ -60,58 +60,9 @@ export default class Quiz {
 
   private timer: Timer = new Timer(0);
 
-  constructor(roomID: string, quiz: QuizData) {
+  constructor(roomID: string, quiz: string) {
     this.roomID = roomID;
-    this.quiz = quiz;
-
-    this.quiz = {
-      quizName: "My super quiz",
-      questions: [
-        {
-          question: "1st question?",
-          delay: 5,
-          answers: [
-            { answer: "New answer" },
-            { answer: "true" },
-            { answer: "New answer" },
-            { answer: "New answer" },
-          ],
-          rightAnswer: 1,
-        },
-        {
-          question: "Question",
-          delay: 5,
-          answers: [
-            { answer: "New answer" },
-            { answer: "New answer" },
-            { answer: "True" },
-          ],
-          rightAnswer: 2,
-        },
-        {
-          question: "Oui,?",
-          delay: 5,
-          answers: [{ answer: "Hello" }, { answer: "New answer" }],
-          rightAnswer: 0,
-        },
-        {
-          question: "Goodbye",
-          delay: 5,
-          answers: [
-            { answer: "New answer" },
-            { answer: "New answer" },
-            { answer: "New answer" },
-            { answer: "New answer" },
-            { answer: "New answer" },
-            { answer: "New answer" },
-            { answer: "New answer" },
-            { answer: "orevoir" },
-            { answer: "New answer" },
-          ],
-          rightAnswer: 7,
-        },
-      ],
-    };
+    this.quiz = JSON.parse(quiz);
   }
 
   public joinRoom(socket: SocketIO.Socket): void {
