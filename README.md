@@ -1,5 +1,9 @@
 # Cozy_quiz
 
+Cozy quiz is a University project of web development.
+
+The purpose of this project is to enable people to create quiz and share them easily. The project rely on websockets thanks to Socket.io as main way of communication between clients and server. Vue.JS is also used for the frontend part.
+
 ## Development
 
 **IMPORTANT: Start backend first then frontend !**
